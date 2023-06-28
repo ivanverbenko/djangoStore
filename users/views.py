@@ -29,6 +29,7 @@ def registration(request):
     form=UserRegistrationForm()
     context={'form':form}
     return render(request,'users/register.html', context)
+
 def profile(request):
     if request.method=='POST':
         form=UsersProfileForm(instance=request.user,data=request.POST, files=request.FILES)
@@ -41,3 +42,7 @@ def profile(request):
         form=UsersProfileForm(instance=request.user)
     context = {'title': 'Профиль','form':form}
     return render(request,'users/profile.html', context)
+
+def logout(request):
+    auth.logout(request)
+    return HttpResponseRedirect(reverse('index'))
