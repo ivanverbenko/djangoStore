@@ -32,7 +32,7 @@ def registration(request):
     return render(request,'users/register.html', context)
 
 def profile(request):
-    if request.method=='POST':
+    if request.method=='GET':
         form=UsersProfileForm(instance=request.user,data=request.POST, files=request.FILES)
         if form.is_valid():
             form.save()
