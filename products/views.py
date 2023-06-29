@@ -1,6 +1,6 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 from products.models import Product, ProductCategory, Basket
 
@@ -15,6 +15,7 @@ def products(request):
                'categories': ProductCategory.objects.all()}
     return render(request, 'products/products.html',context)
 
+@login_required
 def basket_add(request, product_id):
     product = Product.objects.get(id=product_id)
     baskets = Basket.objects.filter(user=request.user, product=product)
