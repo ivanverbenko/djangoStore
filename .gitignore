@@ -4,3 +4,4 @@ db.sqlite3
 /products_images/14202.30_4_500.jpg
 *.json
 *.jpeg
+__pycache__/
