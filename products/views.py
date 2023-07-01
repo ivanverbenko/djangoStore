@@ -2,7 +2,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 # Create your views here.
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView
 
 from products.models import Product, ProductCategory, Basket
 from django.core.paginator import Paginator
@@ -45,6 +45,8 @@ def basket_add(request, product_id):
         baskets.quantity += 1
         baskets.save()
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
 
 def basket_remove(request, basket_id):
     basket=Basket.objects.get(id=basket_id)
