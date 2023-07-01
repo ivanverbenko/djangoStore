@@ -11,3 +11,4 @@ urlpatterns = [
     path('profile/<int:pk>',login_required(UserProfileView.as_view()),name='profile'),
     path('logout', logout, name='logout')
 ]
+#branch test
