@@ -4,22 +4,25 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 from django.views.generic import ListView, CreateView
 
+from common.views import CommonMixin
 from products.models import Product, ProductCategory, Basket
 from django.core.paginator import Paginator
 from django.views.generic.base import TemplateView
 
-class IndexView(TemplateView):
+class IndexView(CommonMixin,TemplateView):
     template_name = 'products/index.html'
+    context = 'Store'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = 'Store'
         return context
 
-class ProductsListView(ListView):
+class ProductsListView(CommonMixin, ListView):
     model = Product
     paginate_by = 6
     template_name = 'products/products.html'
+    title = 'Catalog'
 
     def get_queryset(self):
         queryset = super(ProductsListView, self).get_queryset()
@@ -28,7 +31,6 @@ class ProductsListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = 'Catalog'
         context['categories'] = ProductCategory.objects.all()
         return context
 
