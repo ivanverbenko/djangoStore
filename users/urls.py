@@ -8,7 +8,7 @@ app_name='users'
 urlpatterns = [
     path('login/',login,name='login'),
     path('registration/',UserRegistrationView.as_view(),name='registration'),
-    path('profile/<int:pk>',login_required(UserProfileView.as_view()),name='profile'),
+    path('profile/',login_required(UserProfileView.as_view()),name='profile'),
     path('logout', logout, name='logout')
 ]
 #branch test

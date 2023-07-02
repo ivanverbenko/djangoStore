@@ -1,8 +1,7 @@
-
-from django.shortcuts import render, HttpResponseRedirect
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView
-
 from common.views import CommonMixin
 from products.models import Basket
 from users.models import User
@@ -33,17 +32,22 @@ class UserRegistrationView(CommonMixin, CreateView):
     title = 'Регистрация'
 
 
-class UserProfileView(CommonMixin,UpdateView):
+class UserProfileView(LoginRequiredMixin, CommonMixin, UpdateView):
     model = User
     form_class = UsersProfileForm
     template_name = 'users/profile.html'
     title = 'Профиль'
 
+    def get_object(self, queryset=None):
+        user_profile = get_object_or_404(User, pk=self.request.user.pk)
+        return user_profile
+
     def get_success_url(self):
-        return reverse_lazy('users:profile', args=(self.object.id,))
+        return reverse_lazy('users:profile')
+
     def get_context_data(self, **kwargs):
-        context = super(UserProfileView, self).get_context_data()
-        context['baskets'] = Basket.objects.filter(user=self.object)
+        context = super().get_context_data(**kwargs)
+        context['baskets'] = Basket.objects.filter(user=self.request.user)
         return context
 
 def logout(request):
