@@ -1,10 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, TemplateView
 from common.views import CommonMixin
 from products.models import Basket
-from users.models import User
+from users.models import User, EmailVerification
 from users.forms import UserLoginForm, UserRegistrationForm, UsersProfileForm
 from django.contrib import auth
 
@@ -53,3 +53,19 @@ class UserProfileView(LoginRequiredMixin, CommonMixin, UpdateView):
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect(reverse('index'))
+
+class EmailVerificationView(LoginRequiredMixin,CommonMixin, TemplateView):
+    title = 'Подтверждение электронной почты'
+    template_name = 'users/email_verification.html'
+
+    def get(self, request, *args, **kwargs):
+        code = kwargs['code']
+        user = self.request.user
+        email_verifications = EmailVerification.objects.filter(user=user,code=code)
+        print(email_verifications)
+        if email_verifications.exists():
+            user.is_verified_email = True
+            user.save()
+            return super(EmailVerificationView, self).get(request, *args, **kwargs)
+        else:
+            return HttpResponseRedirect(reverse('index'))
