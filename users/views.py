@@ -1,28 +1,30 @@
+from django.contrib import auth
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
+from django.shortcuts import HttpResponseRedirect, get_object_or_404, render
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, UpdateView, TemplateView
+from django.views.generic import CreateView, TemplateView, UpdateView
+
 from common.views import CommonMixin
 from products.models import Basket
-from users.models import User, EmailVerification
 from users.forms import UserLoginForm, UserRegistrationForm, UsersProfileForm
-from django.contrib import auth
+from users.models import EmailVerification, User
 
-# Create your views here.
+
 def login(request):
-    if request.method=='POST':
-        form=UserLoginForm(data=request.POST)
+    if request.method == 'POST':
+        form = UserLoginForm(data=request.POST)
         if form.is_valid():
             username = request.POST['username']
             password = request.POST['password']
             user = auth.authenticate(username=username, password=password)
             if user:
-                auth.login(request,user)
+                auth.login(request, user)
                 return HttpResponseRedirect(reverse('index'))
     else:
         form = UserLoginForm()
-    context = {'form' : form,'title':'Логин'}
-    return render(request,'users/login.html',context)
+    context = {'form': form, 'title': 'Логин'}
+    return render(request, 'users/login.html', context)
+
 
 class UserRegistrationView(CommonMixin, CreateView):
     model = User
@@ -50,18 +52,20 @@ class UserProfileView(LoginRequiredMixin, CommonMixin, UpdateView):
         context['baskets'] = Basket.objects.filter(user=self.request.user)
         return context
 
+
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect(reverse('index'))
 
-class EmailVerificationView(LoginRequiredMixin,CommonMixin, TemplateView):
+
+class EmailVerificationView(LoginRequiredMixin, CommonMixin, TemplateView):
     title = 'Подтверждение электронной почты'
     template_name = 'users/email_verification.html'
 
     def get(self, request, *args, **kwargs):
         code = kwargs['code']
         user = self.request.user
-        email_verifications = EmailVerification.objects.filter(user=user,code=code)
+        email_verifications = EmailVerification.objects.filter(user=user, code=code)
         print(email_verifications)
         if email_verifications.exists():
             user.is_verified_email = True

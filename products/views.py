@@ -1,15 +1,13 @@
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-# Create your views here.
-from django.views.generic import ListView, CreateView
-
-from common.views import CommonMixin
-from products.models import Product, ProductCategory, Basket
-from django.core.paginator import Paginator
+from django.http import HttpResponseRedirect
+from django.views.generic import ListView
 from django.views.generic.base import TemplateView
 
-class IndexView(CommonMixin,TemplateView):
+from common.views import CommonMixin
+from products.models import Basket, Product, ProductCategory
+
+
+class IndexView(CommonMixin, TemplateView):
     template_name = 'products/index.html'
     context = 'Store'
 
@@ -17,6 +15,7 @@ class IndexView(CommonMixin,TemplateView):
         context = super().get_context_data(**kwargs)
         context["title"] = 'Store'
         return context
+
 
 class ProductsListView(CommonMixin, ListView):
     model = Product
@@ -41,7 +40,7 @@ def basket_add(request, product_id):
     baskets = Basket.objects.filter(user=request.user, product=product)
 
     if not baskets.exists():
-        Basket.objects.create(user=request.user, product=product,quantity=1)
+        Basket.objects.create(user=request.user, product=product, quantity=1)
     else:
         baskets = baskets.first()
         baskets.quantity += 1
@@ -49,8 +48,7 @@ def basket_add(request, product_id):
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
-
 def basket_remove(request, basket_id):
-    basket=Basket.objects.get(id=basket_id)
+    basket = Basket.objects.get(id=basket_id)
     basket.delete()
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
