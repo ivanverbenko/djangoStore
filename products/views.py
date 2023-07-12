@@ -9,12 +9,7 @@ from products.models import Basket, Product, ProductCategory
 
 class IndexView(CommonMixin, TemplateView):
     template_name = 'products/index.html'
-    context = 'Store'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = 'Store'
-        return context
+    title = "Store"
 
 
 class ProductsListView(CommonMixin, ListView):
@@ -24,7 +19,7 @@ class ProductsListView(CommonMixin, ListView):
     title = 'Catalog'
 
     def get_queryset(self):
-        queryset = super(ProductsListView, self).get_queryset()
+        queryset = super(ProductsListView, self).get_queryset().order_by('id')
         category_id = self.kwargs.get('category_id')
         return queryset.filter(category_id=category_id) if category_id else queryset
 
