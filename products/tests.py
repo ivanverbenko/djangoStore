@@ -1,4 +1,5 @@
 from http import HTTPStatus
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -15,10 +16,13 @@ class IndexViewTestCase(TestCase):
         self.assertEqual(response.context_data['title'], 'Store')
         self.assertTemplateUsed(response, 'products/index.html')
 
+
 class ProductsListViewTestCase(TestCase):
-    fixtures = ['categories.json','prod.json']
+    fixtures = ['categories.json', 'prod.json']
+
     def setUp(self):
         self.products = Product.objects.all()
+
     def test_list(self):
         path = reverse('products:index')
         response = self.client.get(path)
@@ -33,10 +37,10 @@ class ProductsListViewTestCase(TestCase):
 
         self._common_test(response)
         self.assertEqual(
-            list(response.context_data['object_list']),list(self.products.filter(category_id=category.id))
+            list(response.context_data['object_list']), list(self.products.filter(category_id=category.id))
         )
 
-    def _common_test(self,response):
+    def _common_test(self, response):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, 'products/products.html')
         self.assertEqual(response.context_data['title'], 'Catalog')
