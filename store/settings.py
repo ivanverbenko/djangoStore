@@ -139,7 +139,7 @@ LOGIN_URL = '/users/login'
 # Email
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-#allauth
+# allauth
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
     'django.contrib.auth.backends.ModelBackend',
