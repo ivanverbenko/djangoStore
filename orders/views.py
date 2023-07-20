@@ -1,16 +1,14 @@
 from http import HTTPStatus
 
-from django.urls import reverse_lazy, reverse
+import stripe
+from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse, reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import TemplateView, ListView
+from django.views.generic import ListView, TemplateView
 from django.views.generic.edit import CreateView
-from django.http import HttpResponseRedirect, HttpResponse
 
 from common.views import CommonMixin
 from orders.forms import OrderForm
-
-import stripe
-
 from orders.models import Order
 from products.models import Basket
 from store import settings
