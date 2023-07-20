@@ -1,8 +1,9 @@
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView
 from django.views.generic.base import TemplateView
-from django.core.cache import cache
+
 from common.views import CommonMixin
 from products.models import Basket, Product, ProductCategory
 
@@ -30,7 +31,7 @@ class ProductsListView(CommonMixin, ListView):
             context['categories'] = categories
         else:
             context['categories'] = ProductCategory.objects.all()
-            cache.set('categories',context['categories'],30)
+            cache.set('categories', context['categories'], 30)
         return context
 
 

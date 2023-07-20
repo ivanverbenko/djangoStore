@@ -5,13 +5,14 @@ from django.db import models
 from products.models import Basket
 from users.models import User
 
+
 class Order(models.Model):
     CREATED = 0
     PAID = 1
     ON_WAY = 2
     DELIVERED = 3
     STASUSES = (
-        (CREATED,'Создан'),
+        (CREATED, 'Создан'),
         (PAID, 'Оплачен'),
         (ON_WAY, 'В пути'),
         (DELIVERED, 'Доставлен')
