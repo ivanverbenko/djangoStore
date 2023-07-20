@@ -11,6 +11,7 @@ from orders.forms import OrderForm
 
 import stripe
 
+from orders.models import Order
 from products.models import Basket
 from store import settings
 
@@ -66,14 +67,12 @@ def stripe_webhook_view(request):
         return HttpResponse(status=400)
 
     # Handle the checkout.session.completed event
+    print(event['type'])
+    print(event['type'])
     if event['type'] == 'checkout.session.completed':
+        print(event['type'])
         # Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
-        session = stripe.checkout.Session.retrieve(
-            event['data']['object']['id'],
-            expand=['line_items'],
-        )
-
-
+        session = event['data']['object']
         # Fulfill the purchase...
         fulfill_order(session)
 
@@ -84,4 +83,5 @@ def stripe_webhook_view(request):
 def fulfill_order(session):
     # TODO: fill me in
     order_id = int(session.metadata.order_id)
-    print("Fulfilling order")
+    order = Order.objects.get(id=order_id)
+    order.update_after_payment()

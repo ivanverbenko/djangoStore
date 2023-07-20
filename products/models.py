@@ -6,6 +6,7 @@ import stripe
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
+
 # Create your models here.
 class ProductCategory(models.Model):
     name = models.CharField(max_length=128)
@@ -42,13 +43,14 @@ class Product(models.Model):
         super(Product, self).save(force_insert=False, force_update=False, using=None, update_fields=None)
 
     def create_stripe_product_price(self):
-        stripe_product = stripe.Product.create(name = self.name)
+        stripe_product = stripe.Product.create(name=self.name)
         stripe_product_price = stripe.Price.create(
-            product = stripe_product,
-            unit_amount = round(self.price * 100),
-            currency = 'rub'
+            product=stripe_product,
+            unit_amount=round(self.price * 100),
+            currency='rub'
         )
         return stripe_product_price
+
 
 class BasketQuerySet(models.QuerySet):
     def total_sum(self):
@@ -57,6 +59,7 @@ class BasketQuerySet(models.QuerySet):
     def total_quantity(self):
         return sum(basket.quantity for basket in self
                    )
+
     def stripe_products(self):
         line_items = []
         for basket in self:
@@ -66,6 +69,7 @@ class BasketQuerySet(models.QuerySet):
             }
             line_items.append(item)
         return line_items
+
 
 class Basket(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
@@ -80,3 +84,12 @@ class Basket(models.Model):
 
     def sum(self):
         return self.product.price * self.quantity
+
+    def de_json(self):
+        basket_item = {
+            'product_name': self.product.name,
+            'price': self.product.quantity,
+            'price': float(self.product.price),
+            'sum': float(self.sum()),
+        }
+        return basket_item
