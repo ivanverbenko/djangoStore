@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from django.urls import reverse_lazy, reverse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView
 from django.http import HttpResponseRedirect, HttpResponse
 
@@ -22,8 +22,20 @@ class SuccessTemplateView(CommonMixin, TemplateView):
     template_name = 'orders/success.html'
     title = 'Спасибо за заказ'
 
+
 class CancelTemplateView(CommonMixin, TemplateView):
     template_name = 'orders/cancel.html'
+
+
+class OrderListView(CommonMixin, ListView):
+    template_name = 'orders/orders.html'
+    title = 'Список заказов'
+    queryset = Order.objects.all()
+    ordering = ('-id')
+
+    def get_queryset(self):
+        queryset = super(OrderListView, self).get_queryset()
+        return queryset.filter(initiator=self.request.user)
 
 
 class OrderCreate(CommonMixin, CreateView):
@@ -37,17 +49,17 @@ class OrderCreate(CommonMixin, CreateView):
         basket = Basket.objects.filter(user=self.request.user)
         checkout_session = stripe.checkout.Session.create(
             line_items=basket.stripe_products(),
-            metadata={'order_id':self.object.id},
+            metadata={'order_id': self.object.id},
             mode='payment',
             success_url='{}{}'.format(settings.DOMAIN_NAME, reverse('orders:order_success')),
             cancel_url='{}{}'.format(settings.DOMAIN_NAME, reverse('orders:order_cancel')),
         )
-        return HttpResponseRedirect(checkout_session.url,status=HTTPStatus.SEE_OTHER)
-
+        return HttpResponseRedirect(checkout_session.url, status=HTTPStatus.SEE_OTHER)
 
     def form_valid(self, form):
         form.instance.initiator = self.request.user
         return super(OrderCreate, self).form_valid(form)
+
 
 @csrf_exempt
 def stripe_webhook_view(request):
